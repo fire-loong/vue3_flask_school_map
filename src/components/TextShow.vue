@@ -2,8 +2,7 @@
   <div class="text-container">
     <h1>校园建筑信息表</h1>
 
-    <!-- el-table 表格 -->
-    <el-table :data="buildingList" border style="width: 100%">
+    <el-table :data="pagedList" border style="width: 100%; margin-bottom: 20px">
       <el-table-column label="建筑名称" prop="name" />
       <el-table-column label="经度" prop="longitude" />
       <el-table-column label="纬度" prop="latitude" />
@@ -11,11 +10,23 @@
       <el-table-column label="楼层" prop="floor" />
       <el-table-column label="说明" prop="usage" />
     </el-table>
+
+    <el-pagination
+      v-model:current-page="currentPage"
+      v-model:page-size="pageSize"
+      :total="buildingList.length"
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10, 20, 30, 40]"
+      background
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    />
   </div>
 </template>
 
 <script setup>
-// 直接把 Flask 里的 43 条建筑数据拿来用
+import { computed, ref } from 'vue'
+
 const buildingList = [
   {"name": "学生公寓3", "longitude": 103.9865, "latitude": 30.5805, "height": 22, "floor": 7, "classroomCount": 0, "usage": "学生住宿，提供标准宿舍，配备基础生活设施，如卫生间、阳台、空调等，满足学生日常生活需求"},
   {"name": "学生公寓4", "longitude": 103.9867, "latitude": 30.5807, "height": 20, "floor": 6, "classroomCount": 0, "usage": "学生住宿，提供标准宿舍，配备基础生活设施，如卫生间、阳台、空调等，满足学生日常生活需求"},
@@ -61,12 +72,30 @@ const buildingList = [
   {"name": "新气象楼", "longitude": 103.9875, "latitude": 30.5811, "height": 20, "floor": 6, "classroomCount": 0, "usage": "行政办公和管理服务，包含各职能部门办公室、会议室、接待区，处理学校行政事务和对外服务"},
   {"name": "双中心", "longitude": 103.9873, "latitude": 30.5813, "height": 16, "floor": 4, "classroomCount": 0, "usage": "双中心教学与科研，包含专业实验室、实训场地、教师办公室，用于专业课程教学和科研项目开展"}
 ]
+
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+const pagedList = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return buildingList.slice(start, end)
+})
+
+const handleSizeChange = (val) => {
+  pageSize.value = val
+}
+
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+}
 </script>
 
 <style scoped>
 .text-container {
   padding: 30px;
-  height: 100%;
+  height: calc(100vh - 60px); /* 限制高度，留出分页位置 */
+  overflow-y: auto; /* 超出高度时滚动 */
   box-sizing: border-box;
 }
 

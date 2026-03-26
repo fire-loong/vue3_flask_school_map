@@ -12,7 +12,14 @@
       <p>用途：{{ currentInfo.usage }}</p>
       <button @click="showInfo = false">关闭</button>
     </div>
-    <div class="sidebar">
+
+    <!-- 折叠开关 -->
+    <div class="sidebar-toggle" :class="{ open: sidebarOpen }" @click="toggleSidebar">
+      {{ sidebarOpen ? '〈' : '〉' }}
+    </div>
+
+    <!-- 侧边栏 -->
+    <div class="sidebar" :class="{ open: sidebarOpen }" @click.stop>
       <h3>建筑管理</h3>
       <div class="building-list">
         <div 
@@ -53,7 +60,6 @@ import * as Cesium from 'cesium'
 import { ref, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
-// 连接你的 Flask 后端
 const request = axios.create({
   baseURL: 'http://localhost:5000',
   timeout: 5000
@@ -70,9 +76,31 @@ const startBuilding = ref('')
 const endBuilding = ref('')
 const hasNavigation = ref(false)
 const visibleBuildings = ref([])
-const buildings = ref([]) // 数据从后端来
+const buildings = ref([])
 
-// 从 Flask + 数据库加载建筑
+// 折叠展开控制
+const sidebarOpen = ref(false)
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
+}
+
+// 点击空白关闭
+const handleClickOutside = (e) => {
+  if (sidebarOpen.value && !e.target.closest('.sidebar') && !e.target.closest('.sidebar-toggle')) {
+    sidebarOpen.value = false
+  }
+}
+
+onMounted(() => {
+  loadBuildings()
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  if (viewer) viewer.destroy()
+})
+
 async function loadBuildings() {
   try {
     const res = await request.get('/api/buildings')
@@ -80,15 +108,12 @@ async function loadBuildings() {
     
     buildings.value = res.data
     visibleBuildings.value = buildings.value.map(b => b.name)
-    
-    // 数据加载完成 → 初始化 Cesium
     initCesium()
   } catch (err) {
     console.error("❌ 加载建筑数据失败", err)
   }
 }
 
-// Cesium 初始化（从后端取到数据才执行）
 function initCesium() {
   viewer = new Cesium.Viewer('cesium-container', {
     timeline: false,
@@ -124,7 +149,6 @@ function initCesium() {
     duration: 1.5
   })
 
-  // 根据数据库数据创建模型
   buildings.value.forEach(item => {
     const entity = viewer.entities.add({
       name: item.name,
@@ -149,7 +173,6 @@ function initCesium() {
     entityMap[item.name] = entity
   })
 
-  // 点击事件
   const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas)
   handler.setInputAction((e) => {
     const res = viewer.scene.pick(e.position)
@@ -176,11 +199,6 @@ function initCesium() {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
 }
 
-onMounted(() => {
-  loadBuildings() // 页面加载 → 读后端数据库
-})
-
-// 搜索飞行（调用后端接口）
 const flyToBuilding = async () => {
   try {
     const res = await request.get('/api/building/search', {
@@ -200,7 +218,6 @@ const flyToBuilding = async () => {
   }
 }
 
-// 关闭信息
 const closeAndDeselect = () => {
   showInfo.value = false
   viewer.selectedEntity = null
@@ -211,7 +228,6 @@ const closeAndDeselect = () => {
   }
 }
 
-// 切换建筑显示隐藏
 const toggleBuilding = (name) => {
   const index = visibleBuildings.value.indexOf(name)
   const entity = entityMap[name]
@@ -225,7 +241,6 @@ const toggleBuilding = (name) => {
   }
 }
 
-// 导航
 const startNavigation = () => {
   if (!startBuilding.value || !endBuilding.value) return
   clearNavigation()
@@ -304,23 +319,94 @@ const clearNavigation = () => {
   navigationEntities = []
   hasNavigation.value = false
 }
-
-onUnmounted(() => viewer && viewer.destroy())
 </script>
 
 <style scoped>
 .cesium-container { width: 100vw; height: 100vh; position: relative; }
 .cesium-view { width: 100%; height: 100%; }
-.search-box { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 999; }
-.search-box input { width: 380px; padding: 10px 15px; border-radius: 8px; border: none; outline: none; }
-.search-box button { margin-left: 8px; padding: 10px 16px; background: #409eff; color: white; border: none; border-radius: 8px; cursor: pointer; }
+/* 搜索框 - 高度完全对齐版 */
+.search-box {
+  position: absolute;
+  top: 60px;
+  left: 46%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  align-items: stretch; /* 让子元素高度一致 */
+  gap: 0;
+}
+.search-box input {
+  width: 420px;
+  padding: 0 24px; /* 把上下padding去掉，用height控制 */
+  height: 48px;
+  border-radius: 50px 0 0 50px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+.search-box input:focus {
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(64, 158, 255, 0.25);
+  transform: translateY(-1px);
+}
+.search-box button {
+  padding: 0 28px; /* 把上下padding去掉，用height控制 */
+  height: 48px;
+  background: linear-gradient(135deg, #409eff, #51a5ff);
+  color: white;
+  border: none;
+  border-radius: 0 50px 50px 0;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+  transition: all 0.3s ease;
+}
+.search-box button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(64, 158, 255, 0.4);
+  background: linear-gradient(135deg, #59a6ff, #6bb8ff);
+}
+.search-box button:active {
+  transform: translateY(0);
+}
 .info-panel { position: absolute; top: 80px; right: 20px; width: 320px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index:999; }
 .info-panel button { background: #f56c6c; color: white; border: none; padding: 6px 12px; border-radius:6px; cursor:pointer; }
 
+/* 折叠开关 → 贴在侧边栏右侧中间 */
+.sidebar-toggle {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 60px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #409eff;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+.sidebar-toggle.open {
+  left: calc(20px + 280px); /* 侧边栏宽度 + 初始left */
+  border-radius: 8px 0 0 8px;
+}
+
+/* 侧边栏平滑动画 */
 .sidebar {
   position: absolute;
   top: 20px;
-  left: 20px;
+  left: -300px;
   width: 280px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 10px;
@@ -329,6 +415,10 @@ onUnmounted(() => viewer && viewer.destroy())
   z-index: 999;
   max-height: calc(100vh - 40px);
   overflow-y: auto;
+  transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.sidebar.open {
+  left: 20px;
 }
 
 .sidebar h3 {
