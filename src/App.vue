@@ -1,10 +1,11 @@
 <template>
   <div>
-    <h1>Vue + Cesium 3D成都信息工程大学</h1>
-    <CesiumCUIT></CesiumCUIT>
+    <!-- <CesiumCUIT></CesiumCUIT> -->
+     <router-view />
   </div>
 </template>
 
 <script setup>
-import CesiumCUIT from './components/CesiumCUIT.vue';
+// import CesiumCUIT from './components/CesiumCUIT.vue';
+import LoginPage from './components/LoginPage.vue';
 </script>
