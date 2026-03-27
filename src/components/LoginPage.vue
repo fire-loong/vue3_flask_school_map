@@ -142,8 +142,8 @@ const loginHandle = async () => {
     console.log('登录响应:', res)
 
     if (res.code === 1) {
-      localStorage.setItem('userInfo', JSON.stringify(res.data))
-      localStorage.setItem('isLogin', 'true')
+      sessionStorage.setItem('userInfo', JSON.stringify(res.data))
+      sessionStorage.setItem('isLogin', 'true')
       alert('欢迎你，' + res.data.name)
       
       router.push('/text')

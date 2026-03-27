@@ -55,7 +55,7 @@ const form = ref({
 
 const loadUserInfo = async () => {
   try {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
     if (!userInfo || !userInfo.username) {
       return
     }

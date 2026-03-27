@@ -30,7 +30,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const isLogin = localStorage.getItem('isLogin')
+  const isLogin = sessionStorage.getItem('isLogin') === 'true'
 
   if (to.path === '/') {
     if (isLogin) {

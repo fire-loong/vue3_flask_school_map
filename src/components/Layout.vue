@@ -69,7 +69,7 @@ const route = useRoute()
 const userInfo = ref({})
 
 const userName = computed(() => {
-  const stored = localStorage.getItem('userInfo')
+  const stored = sessionStorage.getItem('userInfo')
   if (stored) {
     const parsed = JSON.parse(stored)
     return parsed.name || '用户'
@@ -80,7 +80,7 @@ const userName = computed(() => {
 let storageListener = null
 
 const syncUserInfo = () => {
-  const stored = localStorage.getItem('userInfo')
+  const stored = sessionStorage.getItem('userInfo')
   if (stored) {
     try {
       userInfo.value = JSON.parse(stored)
@@ -128,8 +128,8 @@ const testBackend = async () => {
 
 const logout = () => {
   if (confirm('确定要退出登录吗？')) {
-    localStorage.removeItem('userInfo')
-    localStorage.removeItem('isLogin')
+    sessionStorage.removeItem('userInfo')
+    sessionStorage.removeItem('isLogin')
     router.push('/')
   }
 }

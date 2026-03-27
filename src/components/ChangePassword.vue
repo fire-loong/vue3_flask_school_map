@@ -71,7 +71,7 @@ const handleChangePassword = async () => {
 
   saving.value = true
   try {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    const userInfo = JSON.parse(sessionStorage.getItem('userInfo'))
     if (!userInfo || !userInfo.id) {
       alert('用户信息不存在，请重新登录')
       router.push('/')
@@ -86,8 +86,8 @@ const handleChangePassword = async () => {
 
     if (res.code === 1) {
       alert('密码修改成功，请重新登录')
-      localStorage.removeItem('userInfo')
-      localStorage.removeItem('isLogin')
+      sessionStorage.removeItem('userInfo')
+      sessionStorage.removeItem('isLogin')
       router.push('/')
     } else {
       alert(res.msg || '密码修改失败')
