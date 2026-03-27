@@ -4,6 +4,8 @@ import Layout from '../components/Layout.vue'
 import TextShow from '../components/TextShow.vue'
 import CesiumCUIT from '../components/CesiumCUIT.vue'
 import BuildingStats from '../components/BuildingStats.vue'
+import ProfilePage from '../components/ProfilePage.vue'
+import ChangePassword from '../components/ChangePassword.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,7 +21,9 @@ const router = createRouter({
       children: [
         { path: '/text', component: TextShow },
         { path: '/map', component: CesiumCUIT },
-        { path: '/building-stats', component: BuildingStats }
+        { path: '/building-stats', component: BuildingStats },
+        { path: '/profile', component: ProfilePage },
+        { path: '/change-password', component: ChangePassword }
       ]
     }
   ]

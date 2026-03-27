@@ -27,10 +27,26 @@
         建筑数据分析
       </div>
 
+      <div 
+        class="menu-item"
+        :class="{ active: route.path === '/profile' }"
+        @click="goTo('/profile')"
+      >
+        个人信息
+      </div>
+
+      <div 
+        class="menu-item"
+        :class="{ active: route.path === '/change-password' }"
+        @click="goTo('/change-password')"
+      >
+        修改密码
+      </div>
+
       <div class="user-section">
         <div class="user-info">
           <span class="user-icon">👤</span>
-          <span class="user-name">{{ userInfo.name || '用户' }}</span>
+          <span class="user-name">{{ userName }}</span>
         </div>
         <button class="test-btn" @click="testBackend">测试后端连接</button>
         <button class="logout-btn" @click="logout">退出登录</button>
@@ -44,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 const router = useRouter()
@@ -52,10 +68,42 @@ const route = useRoute()
 
 const userInfo = ref({})
 
+const userName = computed(() => {
+  const stored = localStorage.getItem('userInfo')
+  if (stored) {
+    const parsed = JSON.parse(stored)
+    return parsed.name || '用户'
+  }
+  return '用户'
+})
+
+let storageListener = null
+
+const syncUserInfo = () => {
+  const stored = localStorage.getItem('userInfo')
+  if (stored) {
+    try {
+      userInfo.value = JSON.parse(stored)
+    } catch (e) {
+      console.error('解析用户信息失败:', e)
+    }
+  }
+}
+
 onMounted(() => {
-  const storedUserInfo = localStorage.getItem('userInfo')
-  if (storedUserInfo) {
-    userInfo.value = JSON.parse(storedUserInfo)
+  syncUserInfo()
+  
+  storageListener = (e) => {
+    if (e.key === 'userInfo') {
+      syncUserInfo()
+    }
+  }
+  window.addEventListener('storage', storageListener)
+})
+
+onUnmounted(() => {
+  if (storageListener) {
+    window.removeEventListener('storage', storageListener)
   }
 })
 

@@ -314,7 +314,7 @@ const clearNavigation = () => {
 </script>
 
 <style scoped>
-.cesium-container { width: 100vw; height: 100vh; position: relative; }
+.cesium-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
 .cesium-view { width: 100%; height: 100%; }
 .loading {
   position: absolute;
@@ -329,9 +329,10 @@ const clearNavigation = () => {
   font-size: 16px;
 }
 .search-box {
+  width: 500px;
   position: absolute;
   top: 60px;
-  left: 46%;
+  left: 44%;
   transform: translateX(-50%);
   z-index: 999;
   display: flex;
@@ -342,11 +343,15 @@ const clearNavigation = () => {
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 .search-box input {
+  flex:1;
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
   width: 200px;
+}
+.search-box input:focus{
+  outline: none;
 }
 .search-box button {
   padding: 8px 16px;
