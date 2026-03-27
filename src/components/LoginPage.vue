@@ -1,60 +1,65 @@
 <template>
   <div class="login-page">
-    <div class="login-box">
-      <h2>成信大数字校园系统</h2>
-
-      <div v-if="isLogin" class="login-form">
-        <div class="input-item">
-          <label>学号</label>
-          <input v-model="username" type="text" placeholder="请输入学号" />
-        </div>
-
-        <div class="input-item">
-          <label>密码</label>
-          <input v-model="password" type="password" placeholder="默认密码：123456" />
-        </div>
-
-        <button class="login-btn" @click="loginHandle">登录</button>
-        <div class="msg" v-if="msgText">{{ msgText }}</div>
-        <div class="switch-text">
-          还没有账号？<span @click="toggleForm" class="link">立即注册</span>
-        </div>
+    <div class="login-container">
+      <div class="logo-section">
+        <img src="@/asset/logo.png" alt="Logo" class="main-logo" />
       </div>
+      <div class="login-box">
+        <h2>成信大数字校园系统</h2>
 
-      <div v-else class="register-form">
-        <div class="input-item">
-          <label>学号</label>
-          <input v-model="regUsername" type="text" placeholder="请输入学号" />
+        <div v-if="isLogin" class="login-form">
+          <div class="input-item">
+            <label>学号</label>
+            <input v-model="username" type="text" placeholder="请输入学号" />
+          </div>
+
+          <div class="input-item">
+            <label>密码</label>
+            <input v-model="password" type="password" placeholder="默认密码：123456" />
+          </div>
+
+          <button class="login-btn" @click="loginHandle">登录</button>
+          <div class="msg" v-if="msgText">{{ msgText }}</div>
+          <div class="switch-text">
+            还没有账号？<span @click="toggleForm" class="link">立即注册</span>
+          </div>
         </div>
 
-        <div class="input-item">
-          <label>姓名</label>
-          <input v-model="regName" type="text" placeholder="请输入姓名" />
-        </div>
+        <div v-else class="register-form">
+          <div class="input-item">
+            <label>学号</label>
+            <input v-model="regUsername" type="text" placeholder="请输入学号" />
+          </div>
 
-        <div class="input-item">
-          <label>性别</label>
-          <select v-model="regGender" class="gender-select">
-            <option value="">请选择性别</option>
-            <option value="男">男</option>
-            <option value="女">女</option>
-          </select>
-        </div>
+          <div class="input-item">
+            <label>姓名</label>
+            <input v-model="regName" type="text" placeholder="请输入姓名" />
+          </div>
 
-        <div class="input-item">
-          <label>密码</label>
-          <input v-model="regPassword" type="password" placeholder="请输入密码（至少6位）" />
-        </div>
+          <div class="input-item">
+            <label>性别</label>
+            <select v-model="regGender" class="gender-select">
+              <option value="">请选择性别</option>
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+          </div>
 
-        <div class="input-item">
-          <label>确认密码</label>
-          <input v-model="regConfirmPassword" type="password" placeholder="请再次输入密码" />
-        </div>
+          <div class="input-item">
+            <label>密码</label>
+            <input v-model="regPassword" type="password" placeholder="请输入密码（至少6位）" />
+          </div>
 
-        <button class="register-btn" @click="registerHandle">注册</button>
-        <div class="msg" v-if="msgText">{{ msgText }}</div>
-        <div class="switch-text">
-          已有账号？<span @click="toggleForm" class="link">立即登录</span>
+          <div class="input-item">
+            <label>确认密码</label>
+            <input v-model="regConfirmPassword" type="password" placeholder="请再次输入密码" />
+          </div>
+
+          <button class="register-btn" @click="registerHandle">注册</button>
+          <div class="msg" v-if="msgText">{{ msgText }}</div>
+          <div class="switch-text">
+            已有账号？<span @click="toggleForm" class="link">立即登录</span>
+          </div>
         </div>
       </div>
     </div>
@@ -194,29 +199,59 @@ const registerHandle = async () => {
 .login-page {
   width: 100vw;
   height: 100vh;
-  background: #f5f7fa;
+  background-image: url('@/asset/bgc.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
+.login-container {
+  display: flex;
+  align-items: center;
+  background: rgb(247, 249, 251);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.logo-section {
+  width: 300px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  padding: 40px;
+}
+
+.main-logo {
+  mix-blend-mode: multiply;
+  width: 200px;
+  height: auto;
+}
+
 .login-box {
   width: 400px;
   padding: 40px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
+
 .login-box h2 {
   text-align: center;
   margin-bottom: 30px;
 }
+
 .input-item {
   margin-bottom: 20px;
 }
+
 .input-item label {
   display: block;
   margin-bottom: 8px;
 }
+
 .input-item input {
   width: 100%;
   height: 44px;
@@ -225,6 +260,7 @@ const registerHandle = async () => {
   border-radius: 6px;
   box-sizing: border-box;
 }
+
 .gender-select {
   width: 100%;
   height: 44px;
@@ -234,6 +270,7 @@ const registerHandle = async () => {
   box-sizing: border-box;
   background: white;
 }
+
 .login-btn, .register-btn {
   width: 100%;
   height: 46px;
@@ -244,26 +281,31 @@ const registerHandle = async () => {
   cursor: pointer;
   font-size: 16px;
 }
+
 .login-btn:hover, .register-btn:hover {
   background: #2563eb;
 }
+
 .msg {
   margin-top: 15px;
   text-align: center;
   color: #ef4444;
   font-size: 14px;
 }
+
 .switch-text {
   margin-top: 20px;
   text-align: center;
   font-size: 14px;
   color: #666;
 }
+
 .switch-text .link {
   color: #3b82f6;
   cursor: pointer;
   text-decoration: underline;
 }
+
 .switch-text .link:hover {
   color: #2563eb;
 }

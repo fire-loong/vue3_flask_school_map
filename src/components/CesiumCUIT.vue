@@ -153,8 +153,8 @@ function initCesium() {
       name: item.name,
       position: Cesium.Cartesian3.fromDegrees(item.longitude, item.latitude),
       model: { 
-        uri: '/asia_building.glb', 
-        scale: 0.2,
+        uri: item.modelUrl || '/asia_building.glb', 
+        scale: Number(item.scale) || 0.2,
         color: Cesium.Color.WHITE,
         colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
         colorBlendAmount: 0.0
