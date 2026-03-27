@@ -1,6 +1,5 @@
 <template>
   <div class="layout-container">
-    <!-- 左侧菜单 -->
     <div class="sidebar">
       <div class="sidebar-header">成信大数字校园系统</div>
 
@@ -27,9 +26,17 @@
       >
         建筑数据分析
       </div>
+
+      <div class="user-section">
+        <div class="user-info">
+          <span class="user-icon">👤</span>
+          <span class="user-name">{{ userInfo.name || '用户' }}</span>
+        </div>
+        <button class="test-btn" @click="testBackend">测试后端连接</button>
+        <button class="logout-btn" @click="logout">退出登录</button>
+      </div>
     </div>
 
-    <!-- 右侧内容 -->
     <div class="content">
       <router-view />
     </div>
@@ -37,12 +44,46 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
 const router = useRouter()
 const route = useRoute()
 
+const userInfo = ref({})
+
+onMounted(() => {
+  const storedUserInfo = localStorage.getItem('userInfo')
+  if (storedUserInfo) {
+    userInfo.value = JSON.parse(storedUserInfo)
+  }
+})
+
 const goTo = (path) => {
   router.push(path)
+}
+
+const testBackend = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/test')
+    console.log('后端测试响应:', response.data)
+    if (response.data.code === 1) {
+      alert('后端连接成功！数据库连接正常！')
+    } else {
+      alert('后端连接成功，但数据库连接失败: ' + response.data.msg)
+    }
+  } catch (error) {
+    console.error('后端测试错误:', error)
+    alert('后端连接失败！请确保后端服务已启动在 http://localhost:5000')
+  }
+}
+
+const logout = () => {
+  if (confirm('确定要退出登录吗？')) {
+    localStorage.removeItem('userInfo')
+    localStorage.removeItem('isLogin')
+    router.push('/')
+  }
 }
 </script>
 
@@ -56,7 +97,6 @@ const goTo = (path) => {
   overflow: hidden;
 }
 
-/* ========== 左侧美化菜单 ========== */
 .sidebar {
   width: 240px;
   background: #1f2937;
@@ -66,7 +106,6 @@ const goTo = (path) => {
   flex-direction: column;
 }
 
-/* 菜单顶部标题 */
 .sidebar-header {
   height: 65px;
   line-height: 65px;
@@ -78,7 +117,6 @@ const goTo = (path) => {
   border-bottom: 1px solid #374151;
 }
 
-/* 菜单项 —— 修复宽度跳动 */
 .menu-item {
   height: 55px;
   line-height: 55px;
@@ -91,25 +129,76 @@ const goTo = (path) => {
   gap: 10px;
 }
 
-/*  hover 效果 */
 .menu-item:hover {
   background: #374151;
   color: #ffffff;
-  border-left-color: #60a5fa;
 }
 
-/* 选中高亮 */
 .menu-item.active {
   background: #3b82f6;
   color: #ffffff;
-  border-left-color: #ffffff;
 }
 
-/* ========== 右侧内容区 ========== */
+.user-section {
+  margin-top: auto;
+  padding: 20px;
+  border-top: 1px solid #374151;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #374151;
+  border-radius: 6px;
+}
+
+.user-icon {
+  font-size: 20px;
+}
+
+.user-name {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.test-btn {
+  width: 100%;
+  padding: 10px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+  margin-bottom: 10px;
+}
+
+.test-btn:hover {
+  background: #059669;
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 10px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}
+
 .content {
   flex: 1;
-  background: #f9fafb;
   overflow: auto;
-  box-sizing: border-box;
 }
 </style>

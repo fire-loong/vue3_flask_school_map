@@ -14,7 +14,7 @@ const router = createRouter({
       component: LoginPage
     },
     {
-      path: '/',
+      path: '/layout',
       component: Layout,
       children: [
         { path: '/text', component: TextShow },
@@ -23,6 +23,24 @@ const router = createRouter({
       ]
     }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  const isLogin = localStorage.getItem('isLogin')
+
+  if (to.path === '/') {
+    if (isLogin) {
+      next('/text')
+    } else {
+      next()
+    }
+  } else {
+    if (isLogin) {
+      next()
+    } else {
+      next('/')
+    }
+  }
 })
 
 export default router
